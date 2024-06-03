@@ -24,6 +24,7 @@
  ****************************************************************************/
 
 #include "MainScene.h"
+#include "ui/UIWebView/UIWebView.h"
 
 USING_NS_AX;
 
@@ -85,56 +86,27 @@ bool MainScene::init()
     touchListener->onTouchesEnded = AX_CALLBACK_2(MainScene::onTouchesEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    //auto mouseListener           = EventListenerMouse::create();
+    auto mouseListener           = EventListenerMouse::create();
     //mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
-    //mouseListener->onMouseUp     = AX_CALLBACK_1(MainScene::onMouseUp, this);
-    //mouseListener->onMouseDown   = AX_CALLBACK_1(MainScene::onMouseDown, this);
-    //mouseListener->onMouseScroll = AX_CALLBACK_1(MainScene::onMouseScroll, this);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+    mouseListener->onMouseUp     = AX_CALLBACK_1(MainScene::onMouseUp, this);
+    mouseListener->onMouseDown   = AX_CALLBACK_1(MainScene::onMouseDown, this);
+    mouseListener->onMouseScroll = AX_CALLBACK_1(MainScene::onMouseScroll, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
     //auto keyboardListener           = EventListenerKeyboard::create();
     //keyboardListener->onKeyPressed  = AX_CALLBACK_2(MainScene::onKeyPressed, this);
     //keyboardListener->onKeyReleased = AX_CALLBACK_2(MainScene::onKeyReleased, this);
     //_eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 11);
 
+    auto webView = utils::createInstance<ui::WebView>();
+    const float viewSizeScale = 2.f / 3.f;
+    auto webViewSize          = Vec2(visibleSize.width * viewSizeScale, visibleSize.height * viewSizeScale);
+    webView->setContentSize(webViewSize);
+    webView->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
+    webView->loadURL("https://www.google.com/");
 
-    // add a label shows "Hello World"
-    // create and initialize a label
-
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    if (label == nullptr)
-    {
-        problemLoading("'fonts/Marker Felt.ttf'");
-    }
-    else
-    {
-        // position the label on the center of the screen
-        label->setPosition(
-            Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - label->getContentSize().height));
-
-        // add the label as a child to this layer
-        this->addChild(label, 1);
-    }
-    // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("HelloWorld.png"sv);
-    if (sprite == nullptr)
-    {
-        problemLoading("'HelloWorld.png'");
-    }
-    else
-    {
-        // position the sprite on the center of the screen
-        sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-
-        // add the sprite as a child to this layer
-        this->addChild(sprite, 0);
-        auto drawNode = DrawNode::create();
-        drawNode->setPosition(Vec2(0, 0));
-        addChild(drawNode);
-
-        drawNode->drawRect(safeArea.origin + Vec2(1, 1), safeArea.origin + safeArea.size, Color4F::BLUE);
-    }
+    addChild(webView);
 
     // scheduleUpdate() is required to ensure update(float) is called on every loop
     scheduleUpdate();
@@ -199,6 +171,10 @@ void MainScene::onKeyPressed(EventKeyboard::KeyCode code, Event* event)
 void MainScene::onKeyReleased(EventKeyboard::KeyCode code, Event* event)
 {
     AXLOG("onKeyReleased, keycode: %d", static_cast<int>(code));
+}
+
+void MainScene::onWebViewWidgetEvent(ax::Object* sender, int something) {
+    AXLOG("ax::Object* sender: %d", something);
 }
 
 void MainScene::update(float delta)

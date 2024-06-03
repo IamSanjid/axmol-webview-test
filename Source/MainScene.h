@@ -60,6 +60,8 @@ public:
     void onKeyPressed(ax::EventKeyboard::KeyCode code, ax::Event* event);
     void onKeyReleased(ax::EventKeyboard::KeyCode code, ax::Event* event);
 
+    void onWebViewWidgetEvent(ax::Object* sender, int something);
+
     // a selector callback
     void menuCloseCallback(ax::Object* sender);
 
