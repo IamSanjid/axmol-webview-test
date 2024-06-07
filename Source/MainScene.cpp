@@ -48,9 +48,9 @@ bool MainScene::init()
     }
 
     auto visibleSize = _director->getVisibleSize();
-    auto origin = _director->getVisibleOrigin();
-    auto safeArea = _director->getSafeAreaRect();
-    auto safeOrigin = safeArea.origin;
+    auto origin      = _director->getVisibleOrigin();
+    auto safeArea    = _director->getSafeAreaRect();
+    auto safeOrigin  = safeArea.origin;
 
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
@@ -58,7 +58,7 @@ bool MainScene::init()
 
     // add a "close" icon to exit the progress. it's an autorelease object
     auto closeItem = MenuItemImage::create("CloseNormal.png", "CloseSelected.png",
-        AX_CALLBACK_1(MainScene::menuCloseCallback, this));
+                                           AX_CALLBACK_1(MainScene::menuCloseCallback, this));
 
     if (closeItem == nullptr || closeItem->getContentSize().width <= 0 || closeItem->getContentSize().height <= 0)
     {
@@ -80,31 +80,42 @@ bool MainScene::init()
     // 3. add your codes below...
 
     // Some templates (uncomment what you  need)
-    auto touchListener = EventListenerTouchAllAtOnce::create();
+    auto touchListener            = EventListenerTouchAllAtOnce::create();
     touchListener->onTouchesBegan = AX_CALLBACK_2(MainScene::onTouchesBegan, this);
     touchListener->onTouchesMoved = AX_CALLBACK_2(MainScene::onTouchesMoved, this);
     touchListener->onTouchesEnded = AX_CALLBACK_2(MainScene::onTouchesEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    auto mouseListener           = EventListenerMouse::create();
-    //mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
+    auto mouseListener = EventListenerMouse::create();
+    // mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
     mouseListener->onMouseUp     = AX_CALLBACK_1(MainScene::onMouseUp, this);
     mouseListener->onMouseDown   = AX_CALLBACK_1(MainScene::onMouseDown, this);
     mouseListener->onMouseScroll = AX_CALLBACK_1(MainScene::onMouseScroll, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
-    //auto keyboardListener           = EventListenerKeyboard::create();
-    //keyboardListener->onKeyPressed  = AX_CALLBACK_2(MainScene::onKeyPressed, this);
-    //keyboardListener->onKeyReleased = AX_CALLBACK_2(MainScene::onKeyReleased, this);
+    // auto keyboardListener           = EventListenerKeyboard::create();
+    // keyboardListener->onKeyPressed  = AX_CALLBACK_2(MainScene::onKeyPressed, this);
+    // keyboardListener->onKeyReleased = AX_CALLBACK_2(MainScene::onKeyReleased, this);
     //_eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 11);
 
-    auto webView = utils::createInstance<ui::WebView>();
+    auto webView              = utils::createInstance<ui::WebView>();
     const float viewSizeScale = 2.f / 3.f;
     auto webViewSize          = Vec2(visibleSize.width * viewSizeScale, visibleSize.height * viewSizeScale);
     webView->setContentSize(webViewSize);
     webView->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
-    webView->loadURL("https://www.google.com/");
+    webView->loadHTMLString("<h1>I am a H1</h1>");
+
+    static bool firstTimeFinished = false;
+    webView->setOnDidFinishLoading([&](ui::WebView* sender, std::string_view url) {
+        if (!firstTimeFinished)
+        {
+            sender->evaluateJS("alert('hello webview from js');");
+            sender->loadURL("https://axmolengine.github.io/");
+            firstTimeFinished = true;
+        }
+        AXLOGI("Finished loading: {}", url);
+    });
 
     addChild(webView);
 
@@ -113,7 +124,6 @@ bool MainScene::init()
 
     return true;
 }
-
 
 void MainScene::onTouchesBegan(const std::vector<ax::Touch*>& touches, ax::Event* event)
 {
@@ -173,7 +183,8 @@ void MainScene::onKeyReleased(EventKeyboard::KeyCode code, Event* event)
     AXLOG("onKeyReleased, keycode: %d", static_cast<int>(code));
 }
 
-void MainScene::onWebViewWidgetEvent(ax::Object* sender, int something) {
+void MainScene::onWebViewWidgetEvent(ax::Object* sender, int something)
+{
     AXLOG("ax::Object* sender: %d", something);
 }
 
@@ -191,7 +202,7 @@ void MainScene::update(float delta)
     {
         /////////////////////////////
         // Add your codes below...like....
-        // 
+        //
         // UpdateJoyStick();
         // UpdatePlayer();
         // UpdatePhysics();
@@ -210,31 +221,31 @@ void MainScene::update(float delta)
     }
 
     case GameState::menu1:
-    {    /////////////////////////////
+    {  /////////////////////////////
         // Add your codes below...like....
-        // 
+        //
         // UpdateMenu1();
         break;
     }
 
     case GameState::menu2:
-    {    /////////////////////////////
+    {  /////////////////////////////
         // Add your codes below...like....
-        // 
+        //
         // UpdateMenu2();
         break;
     }
 
     case GameState::end:
-    {    /////////////////////////////
+    {  /////////////////////////////
         // Add your codes below...like....
-        // 
+        //
         // CleanUpMyCrap();
         menuCloseCallback(this);
         break;
     }
 
-    } //switch
+    }  // switch
 }
 
 void MainScene::menuCloseCallback(ax::Object* sender)
@@ -246,6 +257,6 @@ void MainScene::menuCloseCallback(ax::Object* sender)
      * _director->end() as given above,instead trigger a custom event created in RootViewController.mm
      * as below*/
 
-     // EventCustom customEndEvent("game_scene_close_event");
-     //_eventDispatcher->dispatchEvent(&customEndEvent);
+    // EventCustom customEndEvent("game_scene_close_event");
+    //_eventDispatcher->dispatchEvent(&customEndEvent);
 }
