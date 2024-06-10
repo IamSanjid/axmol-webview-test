@@ -2,7 +2,7 @@
  Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
  Copyright (c) 2019-present Axmol Engine contributors (see AUTHORS.md).
 
- https://axmolengine.github.io/
+ https://axmol.dev/
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -106,15 +106,18 @@ bool MainScene::init()
 
     webView->loadHTMLString("<h1>I am a H1</h1>");
 
-    static bool firstTimeFinished = false;
+    static int loadingCount = 0;
     webView->setOnDidFinishLoading([&](ui::WebView* sender, std::string_view url) {
-        if (!firstTimeFinished)
+        if (loadingCount == 0)
+        {
+            sender->loadURL("https://axmol.dev/");
+        }
+        else if (loadingCount == 1)
         {
             sender->evaluateJS("alert('hello webview from js');");
-            sender->loadURL("https://axmolengine.github.io/");
-            firstTimeFinished = true;
         }
         AXLOGI("Finished loading: {}", url);
+        loadingCount++;
     });
 
     addChild(webView);
